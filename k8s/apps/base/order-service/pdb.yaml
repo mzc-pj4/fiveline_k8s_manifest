@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: order-service-pdb
+  namespace: fiveline
+spec:
+  selector:
+    matchLabels:
+      app: order-service
+  minAvailable: 1
