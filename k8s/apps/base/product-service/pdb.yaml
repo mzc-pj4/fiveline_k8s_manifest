@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: product-service-pdb
+  namespace: fiveline
+spec:
+  selector:
+    matchLabels:
+      app: product-service
+  minAvailable: 1
