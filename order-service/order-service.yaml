@@ -15,12 +15,24 @@ spec:
       labels:
         app: order-service
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
         - name: order-service
           image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           envFrom:
             - configMapRef:
                 name: fiveline-backend-config
