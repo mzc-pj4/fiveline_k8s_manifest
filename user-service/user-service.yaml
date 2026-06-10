@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/user-service:dev-19-cce2cfbf44b63962707964235f8ee22d83df404c
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/user-service:dev-27-b855582e9e0818df9f4d447d7c9ebcf01f9f9a72
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
