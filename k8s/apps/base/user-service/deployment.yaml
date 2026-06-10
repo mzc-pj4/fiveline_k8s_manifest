@@ -43,7 +43,7 @@ spec:
                 topologyKey: topology.kubernetes.io/zone
       containers:
         - name: user-service
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline-ecr/user-service:latest
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/user-service:latest
           imagePullPolicy: Always
           ports:
             - name: http

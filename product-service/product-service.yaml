@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: product-service
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline-ecr/product-service:latest
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/product-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

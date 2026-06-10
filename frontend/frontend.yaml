@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline-ecr/frontend:latest
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
