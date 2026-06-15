@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: fiveline
-  labels:
-    app.kubernetes.io/name: fiveline
-    app.kubernetes.io/part-of: fiveline
-
