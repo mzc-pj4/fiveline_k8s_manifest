@@ -21,7 +21,7 @@ spec:
         fsGroup: 101
       containers:
         - name: admin
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin:latest
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin:dev-3-8e5122e84aba81acd6208253a3f66e9950159b99
           imagePullPolicy: Always
           ports:
             - containerPort: 80
