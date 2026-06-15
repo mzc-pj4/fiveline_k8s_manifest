@@ -5,7 +5,9 @@ namespace: fiveline
 
 resources:
   - namespace.yaml
+  - external-secrets/
   - user-service/
   - product-service/
   - order-service/
-  - ingress.yaml
+  - admin-service/
+  - network-policy/
