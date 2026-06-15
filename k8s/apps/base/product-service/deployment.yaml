@@ -24,11 +24,13 @@ spec:
     spec:
       serviceAccountName: product-service-sa
       terminationGracePeriodSeconds: 30
-      tolerations:
-        - key: "spot"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
+      initContainers:
+        - name: migrate
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/product-service:latest
+          command: ["alembic", "upgrade", "head"]
+          envFrom:
+            - secretRef:
+                name: fiveline-secret
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -43,7 +45,7 @@ spec:
                 topologyKey: topology.kubernetes.io/zone
       containers:
         - name: product-service
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline-ecr/product-service:latest
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/product-service:latest
           imagePullPolicy: Always
           ports:
             - name: http
@@ -61,6 +63,8 @@ spec:
               value: "product-service"
             - name: PORT
               value: "8002"
+            - name: TZ
+              value: "Asia/Seoul"
           resources:
             requests:
               cpu: "100m"

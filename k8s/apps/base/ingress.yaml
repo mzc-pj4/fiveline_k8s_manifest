@@ -15,16 +15,20 @@ metadata:
     alb.ingress.kubernetes.io/unhealthy-threshold-count: "3"
     alb.ingress.kubernetes.io/healthcheck-interval-seconds: "15"
     alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "5"
-    alb.ingress.kubernetes.io/subnets: subnet-0578ca7e0de9d6f3c,subnet-0e818a84ee982022d
-    # ACM/WAF는 보안 담당자 작업 후 아래 주석 해제
-    # alb.ingress.kubernetes.io/certificate-arn: <ACM_CERT_ARN>
-    # alb.ingress.kubernetes.io/ssl-redirect: "443"
-    # alb.ingress.kubernetes.io/wafv2-web-acl-arn: <WAF_REGIONAL_ARN>
+    alb.ingress.kubernetes.io/subnets: subnet-0f35b84275ceb6945,subnet-0e827ebd0c83592c3
+    alb.ingress.kubernetes.io/wafv2-web-acl-arn: "arn:aws:wafv2:ap-northeast-2:089955620282:regional/webacl/fiveline-regional-waf/f076c127-acea-423d-a48d-8aa0f01f1ef7"
 spec:
   ingressClassName: alb
   rules:
     - http:
         paths:
+          - path: /api/auth/admin
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-service
+                port:
+                  number: 8004
           - path: /api/auth
             pathType: Prefix
             backend:
@@ -60,6 +64,13 @@ spec:
                 name: order-service
                 port:
                   number: 8003
+          - path: /api/admin
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-service
+                port:
+                  number: 8004
           - path: /api/health
             pathType: Prefix
             backend:
@@ -67,3 +78,10 @@ spec:
                 name: user-service
                 port:
                   number: 8001
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-service
+                port:
+                  number: 8004
