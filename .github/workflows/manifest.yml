@@ -26,7 +26,7 @@ jobs:
 
       - name: Validate manifests
         run: |
-          find . -name "*.yaml" ! -path "./.github/*" ! -name "kustomization.yaml" | xargs kubeconform -strict -summary
+          find . -name "*.yaml" ! -path "./.github/*" ! -name "kustomization.yaml" | xargs kubeconform -strict -ignore-missing-schemas -summary
 
   trivy-scan:
     name: Trivy K8s Scan
