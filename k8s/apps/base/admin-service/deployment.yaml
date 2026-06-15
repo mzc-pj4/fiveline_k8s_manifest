@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: product-service
+  name: admin-service
   namespace: fiveline
   labels:
-    app: product-service
+    app: admin-service
     project: fiveline
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: product-service
+      app: admin-service
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -19,18 +19,11 @@ spec:
   template:
     metadata:
       labels:
-        app: product-service
+        app: admin-service
         project: fiveline
     spec:
-      serviceAccountName: product-service-sa
+      serviceAccountName: admin-service-sa
       terminationGracePeriodSeconds: 30
-      initContainers:
-        - name: migrate
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/product-service:latest
-          command: ["alembic", "upgrade", "head"]
-          envFrom:
-            - secretRef:
-                name: fiveline-secret
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -41,15 +34,15 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - product-service
+                        - admin-service
                 topologyKey: topology.kubernetes.io/zone
       containers:
-        - name: product-service
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/product-service:latest
+        - name: admin-service
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin-service:latest
           imagePullPolicy: Always
           ports:
             - name: http
-              containerPort: 8002
+              containerPort: 8004
               protocol: TCP
           lifecycle:
             preStop:
@@ -60,9 +53,11 @@ spec:
                 name: fiveline-secret
           env:
             - name: SERVICE_NAME
-              value: "product-service"
+              value: "admin-service"
             - name: PORT
-              value: "8002"
+              value: "8004"
+            - name: ADMIN_CORS_ORIGINS
+              value: "https://dashboard.fiveline.store"
             - name: TZ
               value: "Asia/Seoul"
           resources:
@@ -75,7 +70,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /api/health
-              port: 8002
+              port: 8004
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 3
@@ -84,7 +79,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /api/health
-              port: 8002
+              port: 8004
             initialDelaySeconds: 30
             periodSeconds: 15
             failureThreshold: 3
@@ -93,10 +88,20 @@ spec:
             runAsNonRoot: true
             runAsUser: 1000
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false
             capabilities:
               drop:
                 - ALL
+          volumeMounts:
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
+      volumes:
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000

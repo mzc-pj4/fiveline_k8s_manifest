@@ -4,4 +4,4 @@ metadata:
   name: fiveline
   labels:
     project: fiveline
-    managed-by: kubectl
+    managed-by: argocd

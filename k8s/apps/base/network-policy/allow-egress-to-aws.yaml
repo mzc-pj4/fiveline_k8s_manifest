@@ -1,0 +1,51 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-to-rds
+  namespace: fiveline
+spec:
+  podSelector:
+    matchLabels:
+      project: fiveline
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 10.10.20.0/23
+      ports:
+        - protocol: TCP
+          port: 5432
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-to-redis
+  namespace: fiveline
+spec:
+  podSelector:
+    matchLabels:
+      project: fiveline
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 10.10.30.0/23
+      ports:
+        - protocol: TCP
+          port: 6379
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-to-aws-api
+  namespace: fiveline
+spec:
+  podSelector:
+    matchLabels:
+      project: fiveline
+  egress:
+    - ports:
+        - protocol: TCP
+          port: 443
+    - ports:
+        - protocol: UDP
+          port: 53

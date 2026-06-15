@@ -24,11 +24,13 @@ spec:
     spec:
       serviceAccountName: user-service-sa
       terminationGracePeriodSeconds: 30
-      tolerations:
-        - key: "spot"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
+      initContainers:
+        - name: migrate
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/user-service:latest
+          command: ["alembic", "upgrade", "head"]
+          envFrom:
+            - secretRef:
+                name: fiveline-secret
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -47,7 +49,7 @@ spec:
           imagePullPolicy: Always
           ports:
             - name: http
-              containerPort: 8001
+              containerPort: 8000
               protocol: TCP
           lifecycle:
             preStop:
@@ -60,7 +62,9 @@ spec:
             - name: SERVICE_NAME
               value: "user-service"
             - name: PORT
-              value: "8001"
+              value: "8000"
+            - name: TZ
+              value: "Asia/Seoul"
           resources:
             requests:
               cpu: "100m"
@@ -71,7 +75,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /api/health
-              port: 8001
+              port: 8000
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 3
@@ -80,7 +84,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /api/health
-              port: 8001
+              port: 8000
             initialDelaySeconds: 30
             periodSeconds: 15
             failureThreshold: 3
