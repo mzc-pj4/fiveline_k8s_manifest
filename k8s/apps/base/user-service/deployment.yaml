@@ -31,6 +31,8 @@ spec:
           envFrom:
             - secretRef:
                 name: fiveline-secret
+          securityContext:
+            readOnlyRootFilesystem: true
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
