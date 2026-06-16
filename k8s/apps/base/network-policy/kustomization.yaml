@@ -5,3 +5,4 @@ resources:
   - default-deny.yaml
   - allow-alb-ingress.yaml
   - allow-egress-to-aws.yaml
+  - allow-pod-to-pod.yaml
