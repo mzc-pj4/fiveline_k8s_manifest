@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service-canary
+  namespace: fiveline
+  labels:
+    app: order-service
+    project: fiveline
+spec:
+  type: ClusterIP
+  selector:
+    app: order-service
+  ports:
+    - name: http
+      port: 8003
+      targetPort: 8003
+      protocol: TCP

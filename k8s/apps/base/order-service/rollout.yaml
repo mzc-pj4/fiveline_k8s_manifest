@@ -1,0 +1,126 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: order-service
+  namespace: fiveline
+  labels:
+    app: order-service
+    project: fiveline
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+        project: fiveline
+    spec:
+      serviceAccountName: order-service-sa
+      terminationGracePeriodSeconds: 30
+      initContainers:
+        - name: migrate
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:latest
+          command: ["alembic", "upgrade", "head"]
+          envFrom:
+            - secretRef:
+                name: fiveline-secret
+          securityContext:
+            readOnlyRootFilesystem: true
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - order-service
+                topologyKey: topology.kubernetes.io/zone
+      containers:
+        - name: order-service
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8003
+              protocol: TCP
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep 5"]
+          envFrom:
+            - secretRef:
+                name: fiveline-secret
+          env:
+            - name: SERVICE_NAME
+              value: "order-service"
+            - name: PORT
+              value: "8003"
+            - name: TZ
+              value: "Asia/Seoul"
+            - name: PRODUCT_SERVICE_URL
+              value: "http://product-service:8002"
+          resources:
+            requests:
+              cpu: "150m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8003
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8003
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 3
+            timeoutSeconds: 5
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+  strategy:
+    canary:
+      maxSurge: 1
+      maxUnavailable: 0
+      canaryService: order-service-canary
+      stableService: order-service
+      trafficRouting:
+        alb:
+          ingress: fiveline-ingress
+          servicePort: 8003
+      analysis:
+        startingStep: 1
+        templates:
+          - templateName: order-service-canary-analysis
+      steps:
+        - setWeight: 5
+        - pause:
+            duration: 30m
+        - setWeight: 20
+        - pause:
+            duration: 2h
+        - setWeight: 50
+        - pause: {}
+        - setWeight: 100
