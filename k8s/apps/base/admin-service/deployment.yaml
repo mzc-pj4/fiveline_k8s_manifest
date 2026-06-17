@@ -60,6 +60,8 @@ spec:
               value: "https://dashboard.fiveline.store"
             - name: TZ
               value: "Asia/Seoul"
+            - name: AIOPS_TABLE
+              value: "fiveline-dev-aiops-canary-logs"
           resources:
             requests:
               cpu: "100m"
