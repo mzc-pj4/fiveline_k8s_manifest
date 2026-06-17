@@ -21,7 +21,7 @@ spec:
       terminationGracePeriodSeconds: 30
       initContainers:
         - name: migrate
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-34-31f16a209a1dafc25a612cf39e51701957f38cdf
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-35-0961c30c209b48143b7122777016b0e201be5d4e
           command: ["alembic", "upgrade", "head"]
           envFrom:
             - secretRef:
@@ -42,7 +42,7 @@ spec:
                 topologyKey: topology.kubernetes.io/zone
       containers:
         - name: order-service
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-34-31f16a209a1dafc25a612cf39e51701957f38cdf
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-35-0961c30c209b48143b7122777016b0e201be5d4e
           imagePullPolicy: Always
           ports:
             - name: http
