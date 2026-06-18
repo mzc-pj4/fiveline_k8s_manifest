@@ -21,7 +21,7 @@ spec:
         fsGroup: 101
       containers:
         - name: frontend
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/frontend:dev-85-397dcc5c7ad3336137d15be4777c0fd5395dee46
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/frontend:dev-89-fa3017ae432890491687978e727de06d56f87576
           imagePullPolicy: Always
           ports:
             - containerPort: 80
