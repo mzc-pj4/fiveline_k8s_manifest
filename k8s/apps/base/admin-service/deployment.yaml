@@ -62,6 +62,8 @@ spec:
               value: "Asia/Seoul"
             - name: AIOPS_TABLE
               value: "fiveline-dev-aiops-canary-logs"
+            - name: DASHBOARD_BUCKET
+              value: "fiveline-dashboard"
           resources:
             requests:
               cpu: "100m"
