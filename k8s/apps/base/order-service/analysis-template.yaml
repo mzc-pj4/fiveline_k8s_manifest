@@ -5,12 +5,43 @@ metadata:
   namespace: fiveline
 spec:
   metrics:
-    - name: health-check
-      interval: 1m
-      failureLimit: 2
-      successCondition: result == "ok"
+    - name: error-rate
+      count: 1
+      failureLimit: 0
+      successCondition: result == "Successful"
       provider:
-        web:
-          url: "http://order-service-canary.fiveline.svc.cluster.local:8003/api/health"
-          jsonPath: "{$.status}"
-          timeoutSeconds: 10
+        job:
+          spec:
+            backoffLimit: 0
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                  - name: canary-checker
+                    image: alpine:3.19
+                    command:
+                      - sh
+                      - -c
+                      - |
+                        URL="http://order-service-canary.fiveline.svc.cluster.local:8003/api/health"
+                        TOTAL=20
+                        ERRORS=0
+
+                        for i in $(seq 1 $TOTAL); do
+                          STATUS=$(wget -qO- --server-response "$URL" 2>&1 | grep "HTTP/" | awk '{print $2}' | tail -1)
+                          if [ -z "$STATUS" ] || [ "$STATUS" -ge 500 ]; then
+                            ERRORS=$((ERRORS + 1))
+                          fi
+                          sleep 0.5
+                        done
+
+                        RATE=$((ERRORS * 100 / TOTAL))
+                        echo "Canary error rate: ${RATE}% (${ERRORS}/${TOTAL} requests failed)"
+
+                        if [ "$RATE" -gt 5 ]; then
+                          echo "FAIL: error rate ${RATE}% exceeds 5% threshold - triggering auto rollback"
+                          exit 1
+                        fi
+
+                        echo "PASS: error rate ${RATE}% is within acceptable threshold"
+                        exit 0
