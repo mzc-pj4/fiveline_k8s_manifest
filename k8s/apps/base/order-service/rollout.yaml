@@ -1,5 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: order-service
   namespace: fiveline
@@ -12,10 +12,14 @@ spec:
     matchLabels:
       app: order-service
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
+    canary:
+      steps:
+        - setWeight: 10
+        - pause: {duration: 2m}
+        - setWeight: 30
+        - pause: {duration: 2m}
+        - setWeight: 50
+        - pause: {}
   template:
     metadata:
       labels:
@@ -26,7 +30,7 @@ spec:
       terminationGracePeriodSeconds: 30
       initContainers:
         - name: migrate
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-31-d8a2acccb3dd4f90621f07df79699cd6fa96c2b9
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-61-eb5aedacfe9b8d59f4c989b8638f5673fae9406a
           command: ["alembic", "upgrade", "head"]
           envFrom:
             - secretRef:
@@ -47,7 +51,7 @@ spec:
                 topologyKey: topology.kubernetes.io/zone
       containers:
         - name: order-service
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-31-d8a2acccb3dd4f90621f07df79699cd6fa96c2b9
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-61-eb5aedacfe9b8d59f4c989b8638f5673fae9406a
           imagePullPolicy: Always
           ports:
             - name: http

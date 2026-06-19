@@ -69,9 +69,11 @@ jobs:
 
       - name: Post diff to PR
         uses: actions/github-script@v7
+        env:
+          DIFF: ${{ steps.diff.outputs.diff }}
         with:
           script: |
-            const diff = `${{ steps.diff.outputs.diff }}`;
+            const diff = process.env.DIFF;
             if (!diff) return;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -80,35 +82,35 @@ jobs:
               body: `## Manifest 변경사항\n\`\`\`diff\n${diff}\n\`\`\``
             });
 
-  notify:
-    name: Notify
-    runs-on: ubuntu-latest
-    needs: trivy-scan
-    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Slack 알림
-        uses: slackapi/slack-github-action@v1
-        with:
-          payload: |
-            {
-              "text": "${{ needs.trivy-scan.result == 'success' && '✅' || '❌' }} *Manifest 검증 ${{ needs.trivy-scan.result == 'success' && '성공' || '실패' }}*\n브랜치: ${{ github.ref_name }}\n실행자: ${{ github.actor }}\n커밋: ${{ github.sha }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: 이메일 알림
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "${{ needs.trivy-scan.result == 'success' && '✅' || '❌' }} Manifest 검증 ${{ needs.trivy-scan.result == 'success' && '성공' || '실패' }}"
-          to: ${{ secrets.EMAIL_USERNAME }}
-          from: ${{ secrets.EMAIL_USERNAME }}
-          body: |
-            브랜치: ${{ github.ref_name }}
-            실행자: ${{ github.actor }}
-            커밋: ${{ github.sha }}
-            결과: ${{ needs.trivy-scan.result }}
+  # notify:
+  #   name: Notify
+  #   runs-on: ubuntu-latest
+  #   needs: trivy-scan
+  #   if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #
+  #   steps:
+  #     - name: Slack 알림
+  #       uses: slackapi/slack-github-action@v1
+  #       with:
+  #         payload: |
+  #           {
+  #             "text": "${{ needs.trivy-scan.result == 'success' && '✅' || '❌' }} *Manifest 검증 ${{ needs.trivy-scan.result == 'success' && '성공' || '실패' }}*\n브랜치: ${{ github.ref_name }}\n실행자: ${{ github.actor }}\n커밋: ${{ github.sha }}"
+  #           }
+  #       env:
+  #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  #
+  #     - name: 이메일 알림
+  #       uses: dawidd6/action-send-mail@v3
+  #       with:
+  #         server_address: smtp.gmail.com
+  #         server_port: 465
+  #         username: ${{ secrets.EMAIL_USERNAME }}
+  #         password: ${{ secrets.EMAIL_PASSWORD }}
+  #         subject: "${{ needs.trivy-scan.result == 'success' && '✅' || '❌' }} Manifest 검증 ${{ needs.trivy-scan.result == 'success' && '성공' || '실패' }}"
+  #         to: ${{ secrets.EMAIL_USERNAME }}
+  #         from: ${{ secrets.EMAIL_USERNAME }}
+  #         body: |
+  #           브랜치: ${{ github.ref_name }}
+  #           실행자: ${{ github.actor }}
+  #           커밋: ${{ github.sha }}
+  #           결과: ${{ needs.trivy-scan.result }}

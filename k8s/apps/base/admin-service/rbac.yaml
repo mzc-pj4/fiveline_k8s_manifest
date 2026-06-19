@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: admin-rollout-manager
+  namespace: fiveline
+rules:
+  - apiGroups: ["argoproj.io"]
+    resources: ["rollouts"]
+    verbs: ["get", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["replicasets"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: admin-rollout-manager-binding
+  namespace: fiveline
+subjects:
+  - kind: ServiceAccount
+    name: admin-service-sa
+    namespace: fiveline
+roleRef:
+  kind: Role
+  name: admin-rollout-manager
+  apiGroup: rbac.authorization.k8s.io

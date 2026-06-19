@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: order-service-canary-analysis
+  namespace: fiveline
+spec:
+  metrics:
+    - name: health-check
+      interval: 1m
+      failureLimit: 2
+      successCondition: result == "ok"
+      provider:
+        web:
+          url: "http://order-service-canary.fiveline.svc.cluster.local:8003/api/health"
+          jsonPath: "{$.status}"
+          timeoutSeconds: 10
