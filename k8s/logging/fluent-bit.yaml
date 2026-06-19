@@ -124,6 +124,9 @@ spec:
       terminationGracePeriodSeconds: 30
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: fluent-bit
           image: public.ecr.aws/aws-observability/aws-for-fluent-bit:stable
