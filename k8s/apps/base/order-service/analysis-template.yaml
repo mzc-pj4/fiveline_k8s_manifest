@@ -18,30 +18,33 @@ spec:
                 restartPolicy: Never
                 containers:
                   - name: canary-checker
-                    image: alpine:3.19
+                    image: python:3.11-slim
                     command:
-                      - sh
+                      - python3
                       - -c
                       - |
-                        URL="http://order-service-canary.fiveline.svc.cluster.local:8003/api/health"
-                        TOTAL=20
-                        ERRORS=0
+                        import urllib.request, sys, time
 
-                        for i in $(seq 1 $TOTAL); do
-                          STATUS=$(wget -qO- --server-response "$URL" 2>&1 | grep "HTTP/" | awk '{print $2}' | tail -1)
-                          if [ -z "$STATUS" ] || [ "$STATUS" -ge 500 ]; then
-                            ERRORS=$((ERRORS + 1))
-                          fi
-                          sleep 0.5
-                        done
+                        url = "http://order-service-canary.fiveline.svc.cluster.local:8003/api/health"
+                        total = 20
+                        errors = 0
 
-                        RATE=$((ERRORS * 100 / TOTAL))
-                        echo "Canary error rate: ${RATE}% (${ERRORS}/${TOTAL} requests failed)"
+                        for i in range(total):
+                            try:
+                                res = urllib.request.urlopen(url, timeout=5)
+                                if res.status >= 500:
+                                    errors += 1
+                            except Exception:
+                                errors += 1
+                            if i < total - 1:
+                                time.sleep(0.5)
 
-                        if [ "$RATE" -gt 5 ]; then
-                          echo "FAIL: error rate ${RATE}% exceeds 5% threshold - triggering auto rollback"
-                          exit 1
-                        fi
+                        rate = errors / total * 100
+                        print(f"Canary error rate: {rate:.1f}% ({errors}/{total} failed)")
 
-                        echo "PASS: error rate ${RATE}% is within acceptable threshold"
-                        exit 0
+                        if rate > 5.0:
+                            print(f"FAIL: {rate:.1f}% exceeds 5% threshold - triggering auto rollback")
+                            sys.exit(1)
+
+                        print(f"PASS: {rate:.1f}% within threshold")
+                        sys.exit(0)
