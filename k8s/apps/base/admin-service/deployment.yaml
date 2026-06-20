@@ -38,7 +38,7 @@ spec:
                 topologyKey: topology.kubernetes.io/zone
       containers:
         - name: admin-service
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin-service:dev-34-668958794d1a0e8f3b32e451e2e450378ce6c052
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin-service:dev-37-37374ca82f1bea91b34a70042621da49dc3e7b47
           imagePullPolicy: Always
           ports:
             - name: http
@@ -62,6 +62,8 @@ spec:
               value: "Asia/Seoul"
             - name: AIOPS_TABLE
               value: "fiveline-dev-aiops-canary-logs"
+            - name: DASHBOARD_BUCKET
+              value: "fiveline-dashboard"
           resources:
             requests:
               cpu: "100m"

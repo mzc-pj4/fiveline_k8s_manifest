@@ -1,0 +1,8 @@
+# Fluent Bit DaemonSet requires hostNetwork to access host logs and kubelet metrics
+KSV-0009
+
+# Fluent Bit writes to state directory (/var/fluent-bit/state) - readOnlyRootFilesystem not applicable
+KSV-0014
+
+# Fluent Bit ClusterRole requires nodes/proxy for kubelet log access (Use_Kubelet On)
+KSV-0047
