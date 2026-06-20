@@ -25,6 +25,10 @@ spec:
                       - |
                         import urllib.request, sys, time
 
+                        # canary 파드 안정화 대기
+                        print("Waiting 30s for canary pods to stabilize...")
+                        time.sleep(30)
+
                         url = "http://order-service-canary.fiveline.svc.cluster.local:8003/api/health"
                         total = 20
                         errors = 0
@@ -34,7 +38,8 @@ spec:
                                 res = urllib.request.urlopen(url, timeout=5)
                                 if res.status >= 500:
                                     errors += 1
-                            except Exception:
+                            except Exception as e:
+                                print(f"Request {i+1} failed: {e}")
                                 errors += 1
                             if i < total - 1:
                                 time.sleep(0.5)
