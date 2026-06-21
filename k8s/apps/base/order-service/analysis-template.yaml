@@ -18,7 +18,7 @@ spec:
                 restartPolicy: Never
                 containers:
                   - name: canary-checker
-                    image: python:3.11-slim
+                    image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/tools/python:3.11-slim
                     command:
                       - python3
                       - -c
