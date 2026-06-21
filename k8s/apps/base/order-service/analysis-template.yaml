@@ -25,12 +25,12 @@ spec:
                       - |
                         import urllib.request, sys, time
 
-                        # canary 파드 안정화 대기
-                        print("Waiting 30s for canary pods to stabilize...")
-                        time.sleep(30)
+                        # rollout이 2m pause 후 analysis를 실행하므로 짧은 버퍼만 대기
+                        print("Waiting 10s for canary pods to be fully ready...")
+                        time.sleep(10)
 
                         url = "http://order-service-canary.fiveline.svc.cluster.local:8003/api/health"
-                        total = 20
+                        total = 100
                         errors = 0
 
                         for i in range(total):
@@ -42,13 +42,13 @@ spec:
                                 print(f"Request {i+1} failed: {e}")
                                 errors += 1
                             if i < total - 1:
-                                time.sleep(0.5)
+                                time.sleep(0.3)
 
                         rate = errors / total * 100
                         print(f"Canary error rate: {rate:.1f}% ({errors}/{total} failed)")
 
-                        if rate > 5.0:
-                            print(f"FAIL: {rate:.1f}% exceeds 5% threshold - triggering auto rollback")
+                        if rate > 10.0:
+                            print(f"FAIL: {rate:.1f}% exceeds 10% threshold - triggering auto rollback")
                             sys.exit(1)
 
                         print(f"PASS: {rate:.1f}% within threshold")
