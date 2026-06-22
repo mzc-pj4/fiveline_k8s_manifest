@@ -9,3 +9,4 @@ resources:
   - analysis-template.yaml
   - hpa.yaml
   - pdb.yaml
+  - service-monitor.yaml
