@@ -6,50 +6,16 @@ metadata:
 spec:
   metrics:
     - name: error-rate
-      count: 1
-      failureLimit: 0
-      successCondition: result == "Successful"
+      interval: 30s
+      count: 5
+      failureLimit: 1
+      successCondition: result[0] <= 10.0
       provider:
-        job:
-          spec:
-            backoffLimit: 0
-            template:
-              spec:
-                restartPolicy: Never
-                containers:
-                  - name: canary-checker
-                    image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/tools/python:3.11-slim
-                    command:
-                      - python3
-                      - -c
-                      - |
-                        import urllib.request, sys, time
-
-                        # rollout이 2m pause 후 analysis를 실행하므로 짧은 버퍼만 대기
-                        print("Waiting 10s for canary pods to be fully ready...")
-                        time.sleep(10)
-
-                        url = "http://order-service-canary.fiveline.svc.cluster.local:8003/api/health"
-                        total = 100
-                        errors = 0
-
-                        for i in range(total):
-                            try:
-                                res = urllib.request.urlopen(url, timeout=5)
-                                if res.status >= 500:
-                                    errors += 1
-                            except Exception as e:
-                                print(f"Request {i+1} failed: {e}")
-                                errors += 1
-                            if i < total - 1:
-                                time.sleep(0.3)
-
-                        rate = errors / total * 100
-                        print(f"Canary error rate: {rate:.1f}% ({errors}/{total} failed)")
-
-                        if rate > 10.0:
-                            print(f"FAIL: {rate:.1f}% exceeds 10% threshold - triggering auto rollback")
-                            sys.exit(1)
-
-                        print(f"PASS: {rate:.1f}% within threshold")
-                        sys.exit(0)
+        prometheus:
+          address: http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            (
+              sum(rate(http_requests_total{namespace="fiveline",job=~".*order-service.*",status_code=~"5.."}[2m]))
+              /
+              sum(rate(http_requests_total{namespace="fiveline",job=~".*order-service.*"}[2m]))
+            ) * 100 or vector(0)
