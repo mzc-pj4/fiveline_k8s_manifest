@@ -6,8 +6,8 @@ metadata:
 spec:
   metrics:
     - name: error-rate
-      count: 5
       interval: 30s
+      count: 5
       failureLimit: 1
       successCondition: result[0] <= 10.0
       provider:
