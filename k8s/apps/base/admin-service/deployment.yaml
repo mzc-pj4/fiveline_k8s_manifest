@@ -38,7 +38,7 @@ spec:
                 topologyKey: topology.kubernetes.io/zone
       containers:
         - name: admin-service
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin-service:dev-71-82b7db65a9a7eb5bfb055bb120c7d04b9f590915
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin-service:dev-72-13d8f7fc03607c55de19a26c4be33114081db4c7
           imagePullPolicy: Always
           ports:
             - name: http
