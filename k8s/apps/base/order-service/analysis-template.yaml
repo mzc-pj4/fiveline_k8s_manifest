@@ -12,7 +12,7 @@ spec:
       successCondition: result[0] <= 10.0
       provider:
         prometheus:
-          address: http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+          address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
           query: |
             (
               sum(rate(http_requests_total{namespace="fiveline",job=~".*order-service.*",status_code=~"5.."}[2m]))
