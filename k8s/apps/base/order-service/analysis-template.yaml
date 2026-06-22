@@ -5,12 +5,17 @@ metadata:
   namespace: fiveline
 spec:
   metrics:
-    - name: health-check
-      interval: 1m
-      failureLimit: 2
-      successCondition: result == "ok"
+    - name: error-rate
+      count: 5
+      interval: 30s
+      failureLimit: 1
+      successCondition: result[0] <= 10.0
       provider:
-        web:
-          url: "http://order-service-canary.fiveline.svc.cluster.local:8003/api/health"
-          jsonPath: "{$.status}"
-          timeoutSeconds: 10
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            (
+              sum(rate(http_requests_total{namespace="fiveline",job=~".*order-service.*",status_code=~"5.."}[2m]))
+              /
+              sum(rate(http_requests_total{namespace="fiveline",job=~".*order-service.*"}[2m]))
+            ) * 100 or vector(0)

@@ -16,8 +16,14 @@ spec:
       steps:
         - setWeight: 10
         - pause: {duration: 2m}
+        - analysis:
+            templates:
+              - templateName: order-service-canary-analysis
         - setWeight: 30
         - pause: {duration: 2m}
+        - analysis:
+            templates:
+              - templateName: order-service-canary-analysis
         - setWeight: 50
         - pause: {}
   template:
