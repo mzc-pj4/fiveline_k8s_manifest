@@ -3,6 +3,8 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: order-service-hpa
   namespace: fiveline
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   scaleTargetRef:
     apiVersion: argoproj.io/v1alpha1
