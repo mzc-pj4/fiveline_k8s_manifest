@@ -4,18 +4,21 @@ metadata:
   name: order-service-canary-analysis
   namespace: fiveline
 spec:
+  args:
+    - name: canary-hash
   metrics:
-    - name: error-rate
+    - name: error-rate-canary
       interval: 30s
       count: 5
-      failureLimit: 1
-      successCondition: result[0] <= 10.0
+      failureLimit: 2
+      # 카나리 pod의 5xx 에러율이 5% 이하여야 통과 (통계적 이상 탐지)
+      successCondition: result[0] <= 5.0
       provider:
         prometheus:
           address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
           query: |
             (
-              sum(rate(http_requests_total{namespace="fiveline",job=~".*order-service.*",status_code=~"5.."}[2m]))
+              sum(rate(http_requests_total{namespace="fiveline", pod=~"order-service-{{args.canary-hash}}-.*", status_code=~"5.."}[2m]))
               /
-              sum(rate(http_requests_total{namespace="fiveline",job=~".*order-service.*"}[2m]))
+              sum(rate(http_requests_total{namespace="fiveline", pod=~"order-service-{{args.canary-hash}}-.*"}[2m]))
             ) * 100 or vector(0)
