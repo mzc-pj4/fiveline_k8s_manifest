@@ -6,3 +6,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - rbac.yaml
+
+images:
+  - name: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin-service
+    newTag: latest

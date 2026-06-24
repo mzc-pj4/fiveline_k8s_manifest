@@ -7,3 +7,7 @@ resources:
   - service.yaml
   - hpa.yaml
   - pdb.yaml
+
+images:
+  - name: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/product-service
+    newTag: latest
