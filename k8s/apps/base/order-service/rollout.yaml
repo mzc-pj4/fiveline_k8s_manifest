@@ -8,6 +8,8 @@ metadata:
     project: fiveline
   annotations:
     argocd.argoproj.io/sync-wave: "3"
+    notifications.argoproj.io/subscribe.on-rollout-completed.slack: deployment-alerts
+    notifications.argoproj.io/subscribe.on-rollout-aborted.slack: deployment-alerts
 spec:
   replicas: 2
   selector:
@@ -35,7 +37,14 @@ spec:
                 valueFrom:
                   podTemplateHashValue: Latest
         - setWeight: 50
-        - pause: {}
+        - pause: {duration: 2m}
+        - analysis:
+            templates:
+              - templateName: order-service-canary-analysis
+            args:
+              - name: canary-hash
+                valueFrom:
+                  podTemplateHashValue: Latest
   template:
     metadata:
       labels:
