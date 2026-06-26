@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: canary-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  canary-dashboard.json: |
+    {
+      "title": "Canary Deployment Monitor",
+      "panels": [
+        {
+          "title": "카나리 vs Stable 트래픽 비율",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_total{namespace='rollout-demo'}[1m])) by (pod)",
+              "legendFormat": "{{pod}}"
+            }
+          ]
+        },
+        {
+          "title": "카나리 5xx 에러율 (임계치: 5%)",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "targets": [
+            {
+              "expr": "(\n  sum(rate(http_requests_total{namespace='rollout-demo', status_code=~'5..'}[1m])) by (pod)\n  /\n  sum(rate(http_requests_total{namespace='rollout-demo'}[1m])) by (pod)\n) * 100",
+              "legendFormat": "에러율 (%) - {{pod}}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "steps": [
+                  {"color": "green", "value": null},
+                  {"color": "yellow", "value": 2},
+                  {"color": "red", "value": 5}
+                ]
+              }
+            }
+          }
+        },
+        {
+          "title": "전체 요청 처리량 (RPS)",
+          "type": "stat",
+          "gridPos": {"h": 4, "w": 6, "x": 0, "y": 8},
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_total{namespace='rollout-demo'}[1m]))",
+              "legendFormat": "RPS"
+            }
+          ]
+        },
+        {
+          "title": "order-service 카나리 에러율",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+          "targets": [
+            {
+              "expr": "(\n  sum(rate(http_requests_total{namespace='fiveline', status_code=~'5..'}[2m])) by (pod)\n  /\n  sum(rate(http_requests_total{namespace='fiveline'}[2m])) by (pod)\n) * 100",
+              "legendFormat": "에러율 (%) - {{pod}}"
+            }
+          ]
+        }
+      ],
+      "time": {"from": "now-15m", "to": "now"},
+      "refresh": "10s"
+    }
