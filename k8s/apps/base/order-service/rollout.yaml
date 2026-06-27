@@ -37,7 +37,7 @@ spec:
                 valueFrom:
                   podTemplateHashValue: Latest
         - setWeight: 50
-        - pause: {duration: 2m}
+        - pause: {}
         - analysis:
             templates:
               - templateName: order-service-canary-analysis
