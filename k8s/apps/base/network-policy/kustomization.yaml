@@ -7,3 +7,4 @@ resources:
   - allow-egress-to-aws.yaml
   - allow-pod-to-pod.yaml
   - allow-argo-rollouts.yaml
+  - allow-prometheus-scraping.yaml

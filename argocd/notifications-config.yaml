@@ -90,12 +90,6 @@ data:
     - when: app.status.health.status == 'Degraded'
       send: [app-health-degraded]
   subscriptions: |
-    - recipients:
-        - slack:deployment-alerts
-      triggers:
-        - on-sync-succeeded
-        - on-sync-failed
-        - on-health-degraded
 ---
 apiVersion: v1
 kind: Secret

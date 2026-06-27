@@ -1,0 +1,72 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: demo-app
+  namespace: rollout-demo
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: demo-app
+  strategy:
+    canary:
+      steps:
+        - setWeight: 10
+        - pause: {duration: 1m}
+        - analysis:
+            templates:
+              - templateName: demo-anomaly-detection
+            args:
+              - name: canary-hash
+                valueFrom:
+                  podTemplateHashValue: Latest
+        - setWeight: 50
+        - pause: {duration: 1m}
+        - analysis:
+            templates:
+              - templateName: demo-anomaly-detection
+            args:
+              - name: canary-hash
+                valueFrom:
+                  podTemplateHashValue: Latest
+  template:
+    metadata:
+      labels:
+        app: demo-app
+    spec:
+      containers:
+        - name: demo-app
+          image: argoproj/rollouts-demo:blue
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-app
+  namespace: rollout-demo
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: demo-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-app-canary
+  namespace: rollout-demo
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: demo-app
