@@ -12,6 +12,7 @@ metadata:
     notifications.argoproj.io/subscribe.on-rollout-aborted.slack: deployment-alerts
 spec:
   replicas: 2
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: order-service
