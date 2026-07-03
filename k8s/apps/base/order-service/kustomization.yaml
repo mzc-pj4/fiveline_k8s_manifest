@@ -13,4 +13,4 @@ resources:
 
 images:
   - name: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service
-    newTag: dev-108-eba001bb26b1c9d8024031b4f5cf961261d31723
+    newTag: dev-111-55901f68618f64ff80a425e7e919b2d95c695c7f
