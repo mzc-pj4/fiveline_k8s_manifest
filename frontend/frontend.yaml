@@ -7,6 +7,7 @@ metadata:
     app: frontend
 spec:
   replicas: 1
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: frontend
@@ -21,7 +22,7 @@ spec:
         fsGroup: 101
       containers:
         - name: frontend
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/frontend:dev-144-1e3db078c37a33541c058573248e3dc7138f4e7c
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/frontend:dev-167-5e223399de8861cae984fbcb904197ded00f4449
           imagePullPolicy: Always
           ports:
             - containerPort: 80

@@ -6,8 +6,11 @@ metadata:
   labels:
     app: product-service
     project: fiveline
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   replicas: 2
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: product-service

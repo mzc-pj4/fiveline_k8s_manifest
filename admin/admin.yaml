@@ -7,6 +7,7 @@ metadata:
     app: admin
 spec:
   replicas: 1
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: admin
@@ -21,7 +22,7 @@ spec:
         fsGroup: 101
       containers:
         - name: admin
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin:dev-3-8e5122e84aba81acd6208253a3f66e9950159b99
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin:dev-179-f26812cef18adad87a33ba7e9466cf6d3624c53c
           imagePullPolicy: Always
           ports:
             - containerPort: 80

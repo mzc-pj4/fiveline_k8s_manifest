@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: demo-anomaly-detection
+  namespace: rollout-demo
+spec:
+  args:
+    - name: canary-hash
+  metrics:
+    - name: success-rate-anomaly
+      interval: 30s
+      count: 5
+      failureLimit: 2
+      # 카나리 파드 5xx 에러율 5% 초과 시 자동 롤백
+      successCondition: result[0] < 0.05
+      provider:
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            (
+              sum(rate(http_requests_total{namespace="rollout-demo", pod=~"demo-app-{{args.canary-hash}}-.*", status_code=~"5.."}[1m]))
+              /
+              sum(rate(http_requests_total{namespace="rollout-demo", pod=~"demo-app-{{args.canary-hash}}-.*"}[1m]))
+            ) or vector(0)

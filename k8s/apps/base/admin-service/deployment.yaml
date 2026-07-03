@@ -6,8 +6,11 @@ metadata:
   labels:
     app: admin-service
     project: fiveline
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   replicas: 1
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: admin-service
@@ -38,7 +41,7 @@ spec:
                 topologyKey: topology.kubernetes.io/zone
       containers:
         - name: admin-service
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin-service:dev-64-41814b1713d704cf36eaff20f041543ae426be96
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin-service:dev-106-1bbde6003c5e2306faffb78844d4e0b744273d76
           imagePullPolicy: Always
           ports:
             - name: http

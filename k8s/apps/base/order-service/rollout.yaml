@@ -6,8 +6,13 @@ metadata:
   labels:
     app: order-service
     project: fiveline
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    notifications.argoproj.io/subscribe.on-rollout-completed.slack: deployment-alerts
+    notifications.argoproj.io/subscribe.on-rollout-aborted.slack: deployment-alerts
 spec:
   replicas: 2
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: order-service
@@ -19,13 +24,28 @@ spec:
         - analysis:
             templates:
               - templateName: order-service-canary-analysis
+            args:
+              - name: canary-hash
+                valueFrom:
+                  podTemplateHashValue: Latest
         - setWeight: 30
         - pause: {duration: 2m}
         - analysis:
             templates:
               - templateName: order-service-canary-analysis
+            args:
+              - name: canary-hash
+                valueFrom:
+                  podTemplateHashValue: Latest
         - setWeight: 50
         - pause: {}
+        - analysis:
+            templates:
+              - templateName: order-service-canary-analysis
+            args:
+              - name: canary-hash
+                valueFrom:
+                  podTemplateHashValue: Latest
   template:
     metadata:
       labels:
@@ -36,7 +56,7 @@ spec:
       terminationGracePeriodSeconds: 30
       initContainers:
         - name: migrate
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-87-277ba4eb729e7a77fbdbd2b6a97e4b3300146631
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-106-7e1ee53a5183631a4108185fc0efa548c53d6236
           command: ["alembic", "upgrade", "head"]
           envFrom:
             - secretRef:
@@ -57,7 +77,7 @@ spec:
                 topologyKey: topology.kubernetes.io/zone
       containers:
         - name: order-service
-          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-87-277ba4eb729e7a77fbdbd2b6a97e4b3300146631
+          image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service:dev-106-7e1ee53a5183631a4108185fc0efa548c53d6236
           imagePullPolicy: Always
           ports:
             - name: http

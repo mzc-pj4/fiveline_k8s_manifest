@@ -5,3 +5,5 @@ metadata:
   labels:
     project: fiveline
     managed-by: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"

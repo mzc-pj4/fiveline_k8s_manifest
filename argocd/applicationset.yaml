@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: fiveline-services
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - service: order-service
+            path: k8s/apps/base/order-service
+            image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/order-service
+          - service: product-service
+            path: k8s/apps/base/product-service
+            image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/product-service
+          - service: user-service
+            path: k8s/apps/base/user-service
+            image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/user-service
+          - service: admin-service
+            path: k8s/apps/base/admin-service
+            image: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/admin-service
+  template:
+    metadata:
+      name: "fiveline-{{service}}"
+      annotations:
+        # Notification Controller
+        notifications.argoproj.io/subscribe.on-sync-succeeded.slack: deployment-alerts
+        notifications.argoproj.io/subscribe.on-sync-failed.slack: deployment-alerts
+        notifications.argoproj.io/subscribe.on-health-degraded.slack: deployment-alerts
+        # Image Updater
+        argocd-image-updater.argoproj.io/image-list: "service={{image}}"
+        argocd-image-updater.argoproj.io/service.update-strategy: latest
+        argocd-image-updater.argoproj.io/service.allow-tags: "regexp:^dev-"
+        argocd-image-updater.argoproj.io/write-back-method: argocd
+        argocd-image-updater.argoproj.io/service.kustomize.image-name: "{{image}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/mzc-pj4/fiveline_k8s_manifest
+        targetRevision: main
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: fiveline
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

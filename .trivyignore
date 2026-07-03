@@ -6,3 +6,7 @@ KSV-0014
 
 # Fluent Bit ClusterRole requires nodes/proxy for kubelet log access (Use_Kubelet On)
 KSV-0047
+
+# argocd-notifications-cm: 'token' 키는 실제 시크릿이 아닌 $slack-token 변수 참조.
+# 실제 Slack 토큰은 argocd-notifications-secret (Kubernetes Secret)에 저장됨.
+KSV-0109
