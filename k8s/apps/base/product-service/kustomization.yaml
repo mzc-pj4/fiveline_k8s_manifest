@@ -10,4 +10,4 @@ resources:
 
 images:
   - name: 089955620282.dkr.ecr.ap-northeast-2.amazonaws.com/fiveline/product-service
-    newTag: dev-43-ba89ef200515d9e1f59879e30a6e9ae48b2dc34d
+    newTag: dev-49-f80e295c9f2dbf166ef0f2fc4ac568b3d5472614
